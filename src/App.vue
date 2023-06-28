@@ -1,10 +1,19 @@
 <template>
-  <nav>
-    <router-link to="/">Home</router-link> |
-    <router-link to="/about">About</router-link>
-  </nav>
+  <NavBar/>
   <router-view/>
 </template>
+
+<script>
+import NavBar from '@/components/NavBar'
+
+
+export default{
+  components: {
+    NavBar
+  }
+}
+
+</script>
 
 <style>
 #app {
@@ -21,10 +30,10 @@ nav {
 
 nav a {
   font-weight: bold;
-  color: #2c3e50;
+  color: #2c3e50 !important;
 }
 
 nav a.router-link-exact-active {
-  color: #42b983;
+  color: rgb(147, 23, 44) !important;
 }
 </style>
