@@ -1,15 +1,18 @@
 <template>
     <div>
-  <h2>Checkout Page</h2>
+  <CheckOut/>
     </div>
 </template>
 
 <script>
+import CheckOut from '@/components/CheckOut.vue';
     export default {
-        
+        components:{
+          CheckOut
+        }
     }
 </script>
 
 <style scoped>
 
-</style>
+</style> 
