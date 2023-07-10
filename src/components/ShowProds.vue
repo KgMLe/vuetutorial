@@ -22,7 +22,7 @@
     </div>
         <div class="container">
             <div class="row row-cols-1 row-cols-md-3 g-4">
-                <div class="col" v-for="item in data" :key="item.ID"> 
+                <div class="col" v-for="item in products" :key="item.id"> 
                     <!-- this is for the key value pairs -->
                     <div class="card" style="width: 18rem">
                         <img :src="item.src" class="card-img-top" alt="..">
@@ -49,16 +49,15 @@
                 data: []
             }
         },
-        methods: {
-        async fetchData(){
-        const  res = await fetch ('https://kgmle.github.io/vuejson/products.json');
-        let parsedData =  await res.json()
-        this.data = parsedData.products
+        computed:{
+            products(){
+                return this.$store.state.products
             }
         },
-        mounted (){
-            this.fetchData()
-        },
+        mounted(){
+            this.$store.dispatch('fetchProducts')
+        }
+    
 
     }
 </script>

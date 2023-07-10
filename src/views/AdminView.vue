@@ -9,10 +9,11 @@
         <path fill-rule="evenodd" d="M10.082 5.629 9.664 7H8.598l1.789-5.332h1.234L13.402 7h-1.12l-.419-1.371h-1.781zm1.57-.785L11 2.687h-.047l-.652 2.157h1.351z"/>
         <path d="M12.96 14H9.028v-.691l2.579-3.72v-.054H9.098v-.867h3.785v.691l-2.567 3.72v.054h2.645V14zm-8.46-.5a.5.5 0 0 1-1 0V3.707L2.354 4.854a.5.5 0 1 1-.708-.708l2-1.999.007-.007a.498.498 0 0 1 .7.006l2 2a.5.5 0 1 1-.707.708L4.5 3.707V13.5z"/>
       </svg></button>
-      <button class="btn btn-light" id="add" data-bs-toggle="modal" data-bs-target="#exampleModal" >Add Product(s) <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-file-earmark-plus-fill" viewBox="0 0 16 16">
+      <button class="btn btn-light" id="add" data-bs-toggle="modal" data-bs-target="#exampleModal" @click="sortProd">Add Product(s) <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-file-earmark-plus-fill" viewBox="0 0 16 16">
         <path d="M9.293 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V4.707A1 1 0 0 0 13.707 4L10 .293A1 1 0 0 0 9.293 0zM9.5 3.5v-2l3 3h-2a1 1 0 0 1-1-1zM8.5 7v1.5H10a.5.5 0 0 1 0 1H8.5V11a.5.5 0 0 1-1 0V9.5H6a.5.5 0 0 1 0-1h1.5V7a.5.5 0 0 1 1 0z"/>
       </svg></button>
-      <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <!-- add product modal -->
+      <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true" >
         <div class="modal-dialog">
         <div class="modal-content">
           <div class="modal-header">
@@ -21,27 +22,31 @@
           </div>
           <div class="container">
             <div class="row">
-          <div class="modal-body">
+              <form  @submit.prevent="saveAdd()">
+                <div class="modal-body">
           <div class="mb-3">
-          <label for="exampleFormControlInput1" class="form-label"> Brand</label>
-          <input type="text" class="form-control" id="brand" > 
+            <!-- ADD PRODUCTS VUE JS HTTP POST REQUEST -->
+          <label for="brand" class="form-label"> Brand</label>
+          <input type="text" class="form-control" name="brand" id="brand" v-model="prodAdd.brand" > 
           </div>
           <div class="mb-3">
-          <label for="exampleFormControlInput1" class="form-label">Image Link</label>
-          <input type="url" class="form-control" id="imgSrc">
+          <label for="src" class="form-label">Image Link</label>
+          <input type="url" class="form-control" name="src" id="src" v-model="prodAdd.src">
           </div>
           <div class="mb-3">
-          <label for="exampleFormControlTextarea1" class="form-label">Description</label>
-          <textarea class="form-control" id="description" rows="3"> </textarea>
+          <label for="description" class="form-label">Description</label>
+          <textarea class="form-control" name="description" id="description" rows="3" v-model="prodAdd.description"></textarea>
          </div>
          <div class="mb-3">
-         <label for="exampleFormControlInput1" class="form-label"> Price(R)</label>
-         <input type="number" class="form-control" id="price"> 
+         <label for="price" class="form-label"> Price(R)</label>
+         <input type="number" class="form-control" name="price" id="price" v-model="prodAdd.price"> 
          </div>
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-success" id="save" onclick="addProd()">Save Changes</button>
+            <!-- SUBMIT ADDITION BUTTON -->
+            <button type="button" class="btn btn-success" id="save" @click="click()" >Save Changes</button>
           </div>
+              </form>
         </div>
       </div>
         </div>
@@ -60,13 +65,13 @@
           <th scope="col">Del</th>
         </tr>
       </thead>
-      <tbody class="table-group-divider"  v-for="item in data" :key="item.ID">
+      <tbody class="table-group-divider"  v-for="item in products" :key="item.ID">
         <tr>
   <th scope="row">{{item.id}}</th>
   <td><span>{{item.brand}}</span></td>
   <td><img :src= item.src alt="specs" style="width: 85px;height: 60px;"></td>
   <td>{{item.description}}</td>
-  <td> R{{item.price}}</td>
+  <td> R{{ item.price }}</td>
 
   <td><button class="btn btn-light" data-bs-toggle="modal" data-bs-target="#exModal-${item.id}" >Edit <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
   <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
@@ -120,39 +125,51 @@
 </template>
 
 <script>
+import axios from 'axios'
     export default {
-        data() {
+      name : 'addProducts',
+      data() {
             return{
-                data: []
+                data: [],
+                prodAdd : {
+                  brand: "",
+                  src: "",
+                  description: "",
+                  price: ""
+                }
             }
         },
-        methods: {
-        async fetchData(){
-        const  res = await fetch ('https://kgmle.github.io/vuejson/products.json');
-        let parsedData =  await res.json()
-        this.data = parsedData.products
+        computed:{
+            products(){
+                return this.$store.state.products
             }
         },
-        mounted (){
-            this.fetchData()
+        mounted(){
+            this.$store.dispatch('fetchProducts')
+        },
+        methods :{
+        saveAdd () {
+            axios.post('https://kgmle.github.io/productsjson/data/', this.prodAdd).then((response) => {
+          const data = response.data;
+          this.data.push(data);
+          this.prodAdd
+        });
         },
         sortProd(){
-  this.data.sort(function(a, b) {
-    const brandA = a.brand.toUpperCase(); 
-    const brandB = b.brand.toUpperCase(); 
-      
-  
-    if (brandA < brandB) {
-      return -1;
-    }
-    if (brandA > brandB) {
-      return 1;
-    }
-
-    return 0;
-  })
- }
-}
+        this.data.sort(function(a, b) {
+        const brandA = a.brand.toUpperCase(); 
+        const brandB = b.brand.toUpperCase(); 
+        if (brandA < brandB) {
+        return -1;
+        }
+        if (brandA > brandB) {
+         return 1;
+        }
+        return 0;
+        })
+        }
+        }
+        }
 </script>
 
 <style scoped>
